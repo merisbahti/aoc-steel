@@ -51,7 +51,6 @@
     (reduce
       (fn (curr acc)
         (define split (split-once curr "   "))
-        (displayln curr split)
         (define snd-nr (string->number (second split)))
         (define fst-nr (string->number (first split)))
         (list
@@ -76,4 +75,4 @@
 
 (assert (sol2 test-input) 31)
 
-(assert (sol2 real-input) 1882714)
+(assert (sol2 real-input) 19437052)
