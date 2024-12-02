@@ -41,4 +41,4 @@
 
 (assert (sol1 test-input) 2)
 
-(assert (sol1 real-input) 235)
+(assert (sol1 real-input) 213)
