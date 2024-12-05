@@ -24,8 +24,7 @@
                 (to-string aEvaled)
                 " !== "
                 (to-string bEvaled)
-                ")")))
-          (displayln)))]))
+                ")")))))]))
 
 (define (run-tests)
   (for-each (lambda (x) (displayln x)) (vector->list *failed-assertions*)))
