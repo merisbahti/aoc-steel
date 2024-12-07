@@ -76,6 +76,45 @@
     (fn (curr acc) (+ acc (* (first curr) (second curr))))
     0
     (parse input '())))
+
 (assert (sol1 "mul(1,2)") 2)
 (assert (sol1 test-input) 161)
 (assert (sol1 real-input) 159892596)
+(define (parse2 input acc enabled-arg)
+  (define enabled
+    (cond
+      [(starts-with? input "do()") #t]
+      [(starts-with? input "don't()") #f]
+      [#t enabled-arg]))
+
+  ; (displayln input acc enabled-arg)
+  (when (equal? (string-length input) 0) (return! acc))
+  (define (next) (parse2 (substring input 1) acc enabled))
+  (when (not enabled) (return! (parse2 (substring input 1) acc enabled)))
+
+  (define mul-res (collect-seq input "mul("))
+  (when (null? (ParseResult-parsed mul-res)) (return! (parse2 (substring input 1) acc enabled)))
+
+  (define fst-nr-res (collect-int (ParseResult-rest mul-res)))
+  (when (null? (ParseResult-parsed fst-nr-res)) (return! (parse2 (substring input 1) acc enabled)))
+
+  (define comma-res (collect-seq (ParseResult-rest fst-nr-res) ","))
+  (when (null? (ParseResult-parsed comma-res)) (return! (parse2 (substring input 1) acc enabled)))
+
+  (define snd-nr-res (collect-int (ParseResult-rest comma-res)))
+  (when (null? (ParseResult-parsed comma-res)) (return! (parse2 (substring input 1) acc enabled)))
+
+  (define end-paren-res (collect-seq (ParseResult-rest snd-nr-res) ")"))
+  (when (null? (ParseResult-parsed end-paren-res)) (return! (parse2 (substring input 1) acc enabled)))
+
+  (parse2
+    (ParseResult-rest end-paren-res)
+    (cons (list (ParseResult-parsed fst-nr-res) (ParseResult-parsed snd-nr-res)) acc)
+    enabled))
+(define (sol2 input)
+  (reduce
+    (fn (curr acc) (+ acc (* (first curr) (second curr))))
+    0
+    (parse2 input '() #t)))
+(assert (sol2 "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))") 48)
+(assert (sol2 real-input) 92626942)
