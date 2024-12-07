@@ -8,7 +8,7 @@
              [aStringified (trim-start-matches (to-string 'a) "'")]
              [bStringified (trim-start-matches (to-string 'b) "'")])
         (when
-          (not (eq? aEvaled bEvaled))
+          (not (equal? aEvaled bEvaled))
           (error-with-span
             (list
               (first (#%syntax-span a))
