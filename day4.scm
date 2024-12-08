@@ -83,7 +83,7 @@ mnop"
   (sum (transduce
         (range 0 max-y)
         (flat-mapping (fn (y) (map (fn (x) (list x y)) (range 0 max-x))))
-        (mapping (fn (coords) 
+        (mapping (fn (coords)
                   (count-xmas str-lists (first coords) (second coords))))
         (into-list))))
 (assert (sol1 test-input) 18)
@@ -97,8 +97,12 @@ mnop"
         (range 0 max-y)
         (flat-mapping (fn (y) (map (fn (x) (list x y)) (range 0 max-x))))
         (mapping (fn (init-coord)
+                  (when (not (equal? "A"
+                              (get-char str-lists (first init-coord) (second init-coord))))
+                    (return! 0))
+
                   (define relative-coords1 (list '(-1 -1) '(0 0) '(1 1)))
-                  (define relative-coords2 (list '(1 -1) '(0 0) '(-1 -1)))
+                  (define relative-coords2 (list '(1 -1) '(0 0) '(-1 1)))
                   (define absolute-coords1
                     (map (fn (rel-coord)
                           (list
@@ -112,12 +116,29 @@ mnop"
                             (+ (second rel-coord) (second init-coord))))
                       relative-coords2))
 
-                  (displayln init-coord absolute-coords1 absolute-coords2)
-
-                  1))
+                  (define char-colls1 (string-join (filter string? (map
+                                                                    (fn (coord)
+                                                                      (define x (first coord))
+                                                                      (define y (second coord))
+                                                                      (get-char str-lists x y))
+                                                                    absolute-coords1))))
+                  (define char-colls2 (string-join (filter string? (map
+                                                                    (fn (coord)
+                                                                      (define x (first coord))
+                                                                      (define y (second coord))
+                                                                      (get-char str-lists x y))
+                                                                    absolute-coords2))))
+                  (define res (if (or
+                                   (and (equal? char-colls1 "MAS") (equal? char-colls2 "SAM"))
+                                   (and (equal? char-colls1 "SAM") (equal? char-colls2 "SAM"))
+                                   (and (equal? char-colls1 "MAS") (equal? char-colls2 "MAS"))
+                                   (and (equal? char-colls1 "SAM") (equal? char-colls2 "MAS")))
+                               1
+                               0))
+                  res))
         (into-list))))
 
 (assert (sol2 test-input) 9)
-(assert (sol2 real-input) 2514)
+(assert (sol2 real-input) 1888)
 
 ; (displayln (with-handler (fn (_) '()) (string-ref "" 10)))
