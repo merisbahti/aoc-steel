@@ -14,20 +14,8 @@
     ((< thing (car into)) (cons thing into))
     (else (cons (first into) (insert-sort thing (rest into))))))
 
-(define (reduce-list fst-list snd-list acc)
-  (cond [
-         (and
-           (null? fst-list)
-           (null? snd-list))
-         acc]
-    [else
-      (reduce-list
-        (rest fst-list)
-        (rest snd-list)
-        (+ acc (abs (- (first fst-list) (first snd-list)))))]))
-
 (define (sol1 input)
-  (define lines (split-many (trim input) "\n"))
+  (define lines (~> input (trim) (split-many "\n")))
   (define lists
     (reduce
       (fn (curr acc)
@@ -39,14 +27,21 @@
           (insert-sort snd-nr (second acc))))
       (list '() '())
       lines))
-  (reduce-list (first lists) (second lists) 0))
+
+  (~>
+    (transduce
+      (first lists)
+      (zipping (second lists))
+      (mapping (fn (item) (abs (- (first item) (second item)))))
+      (into-list))
+    (sum)))
 
 (assert (sol1 test-input) 11)
 
 (assert (sol1 real-input) 1882714)
 
 (define (sol2 input)
-  (define lines (split-many (trim input) "\n"))
+  (define lines (~> input (trim) (split-many "\n")))
   (define lists
     (reduce
       (fn (curr acc)

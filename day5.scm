@@ -51,10 +51,7 @@
   (define rules (map (fn (row) (split-once row "|")) (split-many (first full-split) "\n")))
   (define updates (map (fn (row) (split-many row ",")) (split-many (second full-split) "\n")))
 
-  (displayln rules)
-  (for-each displayln updates)
   (define ok-updates
-
     (filter
       (fn (update)
         (all?
