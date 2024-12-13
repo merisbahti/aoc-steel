@@ -1,5 +1,5 @@
 (require "test.scm")
-; (define real-input (read-port-to-string (open-input-file "day5.txt")))
+(define real-input (read-port-to-string (open-input-file "day5.txt")))
 (define test-input
   "47|53
 97|13
@@ -40,6 +40,7 @@
 (assert (index-of (list) 'a) (None))
 (assert (index-of (list 'a 'b 'c) 'c) 2)
 (assert (index-of (list 'a 'b 'c) 'd) (None))
+
 (define
   (all? pred list)
   (cond
@@ -47,7 +48,7 @@
     [else (and (pred (car list)) (all? pred (cdr list)))]))
 
 (define (sol1 input)
-  (define full-split (split-once input "\n\n"))
+  (define full-split (split-once (trim input) "\n\n"))
   (define rules (map (fn (row) (split-once row "|")) (split-many (first full-split) "\n")))
   (define updates (map (fn (row) (split-many row ",")) (split-many (second full-split) "\n")))
 
@@ -63,6 +64,11 @@
             res)
           rules))
       updates))
-  (sum (map string->number (map (fn (update) (list-ref update (floor (/ (length update) 2)))) ok-updates))))
+  (sum (map (fn (x)
+             (define parsed (string->number x))
+             (unless parsed (error! (string-join (list "error when parsing" x))))
+             parsed)
+        (map (fn (update) (list-ref update (floor (/ (length update) 2)))) ok-updates))))
 
 (assert (sol1 test-input) 143)
+(assert (sol1 real-input) 6041)

@@ -87,7 +87,7 @@ mnop"
                   (count-xmas str-lists (first coords) (second coords))))
         (into-list))))
 (assert (sol1 test-input) 18)
-(assert (sol1 real-input) 2514)
+(assert (sol1 (trim real-input)) 2514)
 
 (define (sol2 input)
   (define str-lists (split-many input "\n"))
