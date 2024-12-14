@@ -27,7 +27,6 @@
 97,61,53,29,13
 75,29,13
 75,97,47,61,53
-97,47,75,29,13
 61,13,29
 97,13,75,29,47")
 (define (index-of list elem)
@@ -108,34 +107,33 @@
               rules)))
       updates))
   (define ordered (map
-                   (fn (update)
-                     (
-                       reduce
-                       (fn (rule update)
-                         (define fst-value (first rule))
-                         (define snd-value (second rule))
-                         (define fst-index (index-of update fst-value))
-                         (define snd-index (index-of update snd-value))
-                         (when (or (None? fst-index) (None? snd-index)) (return! update))
-                         (define res (<= fst-index snd-index))
-                         (if (not res)
-                           (begin
-                             (displayln "reordering" update fst-value snd-value)
-                             (immutable-vector-set
-                               (immutable-vector-set update fst-index snd-value)
-                               snd-index
-                               fst-value))
-
-                           update))
-                       (list->vector update)
-                       rules))
+                   (fn (update) (fix-ordering rules (list->vector update)))
                    not-ok-updates))
-  (displayln not-ok-updates)
-  (displayln ordered)
   (sum
     (map (fn (update) (string->number (vector-ref update (floor (/ (vector-length update) 2))))) ordered)))
 
+(define (fix-ordering rules update)
+  (define result
+    (reduce
+      (fn (rule update)
+        (define fst-value (first rule))
+        (define snd-value (second rule))
+        (define fst-index (index-of update fst-value))
+        (define snd-index (index-of update snd-value))
+        (when (or (None? fst-index) (None? snd-index)) (return! update))
+        (define res (<= fst-index snd-index))
+        (define reordered (immutable-vector-set
+                           (immutable-vector-set update fst-index snd-value)
+                           snd-index
+                           fst-value))
+        (if (not res)
+          (begin
+            reordered)
+          update))
+      update
+      rules))
+  (if (ok-update rules result) result (fix-ordering rules result)))
 (assert (sol2 test-input) 123)
 
 ; 4748 too low
-; (assert (sol2 real-input) 4748)
+(assert (sol2 real-input) 4884)
